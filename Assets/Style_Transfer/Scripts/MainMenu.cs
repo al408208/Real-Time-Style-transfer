@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
@@ -10,8 +11,16 @@ public class MainMenu : MonoBehaviour
     public EventSystem eventSystem;      // Asigna el EventSystem de la escena
     public Image image1, image2, image3;       // Asigna aquí las 3 imágenes a controlar
     public RectTransform selector;
+    
+    private AsyncOperation preloadOperation;
+    private bool sceneReady = false;
 
-
+    void Start()
+    {
+        preloadOperation = SceneManager.LoadSceneAsync("SandBox");
+        preloadOperation.allowSceneActivation = false;
+        StartCoroutine(EsperarCarga());
+    }
     void Update()
     {
         PointerEventData pointerData = new PointerEventData(eventSystem)
@@ -60,13 +69,21 @@ public class MainMenu : MonoBehaviour
     }
     public void FragmentedRealities()
     {
-         SeleccionarModo(2);
+        SeleccionarModo(2);
     }
     public void StyleMechanics()
     {
-         SeleccionarModo(3);
+        SeleccionarModo(3);
     }
 
+    IEnumerator EsperarCarga()
+    {
+        while (preloadOperation.progress < 0.9f)
+            yield return null;
+
+        sceneReady = true;
+        Debug.Log("Escena precargada y lista para activar.");
+    }
     public void SeleccionarModo(int modo)
     {
         if (modo == 1)
@@ -81,6 +98,13 @@ public class MainMenu : MonoBehaviour
         {
             GameManager.Instance.modalidadSeleccionada = GameManager.ModoJuego.C;
         }
-        SceneManager.LoadScene("SandBox");
+        if (sceneReady)
+        {
+            preloadOperation.allowSceneActivation = true;
+        }
+        else
+        {
+            Debug.LogWarning("La escena aún no está lista. Esperá un momento.");
+        }
     }
 }

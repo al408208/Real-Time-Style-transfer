@@ -32,7 +32,8 @@ public class Bullet : MonoBehaviour
             Instantiate(vfxHitred, transform.position,Quaternion.identity);
             
         }
-        if((other.gameObject.layer == 0||other.gameObject.layer == 7) && GameManager.Instance.modalidadSeleccionada==GameManager.ModoJuego.C) {
+        if((other.gameObject.layer == 0||other.gameObject.layer == 7||other.gameObject.layer == 8) &&
+                                GameManager.Instance.modalidadSeleccionada==GameManager.ModoJuego.C) {
             other.gameObject.layer = 6;
             // Get a list of the child objects for the selected GameObject
             Transform[] allChildren = other.transform.gameObject.GetComponentsInChildren<Transform>();

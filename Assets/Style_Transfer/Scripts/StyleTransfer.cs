@@ -33,20 +33,15 @@ public class StyleTransfer : MonoBehaviour
     private Model m_RuntimeModel;
     private IWorker engine;
 
-
-    //mejora que no llega a funcionar
-   /*private RenderTexture lastStylizedFrame;
-    private int frameCounter = 0;
-
-    public float blendAlpha = 0.2f; // cuánto suaviza
-    private Material blendMaterial;
-    private RenderTexture blendTarget;*/
-    
+    [Header("Temporal Blending")]
+    public bool showEdges = false;
+    private RenderTexture previousStylizedFrame;
+    [Range(0f, 1f)] public float blendFactor = 0.2f; // α
+    public bool enableTemporalBlending = true;    // <— controla el blending
 
 
     void Start()
     {
-       // blendMaterial = new Material(Shader.Find("Hidden/BlendLerp"));
 
         // Get the screen dimensions
         int width = Screen.width;
@@ -72,18 +67,18 @@ public class StyleTransfer : MonoBehaviour
         RenderTexture.ReleaseTemporary(styleDepth.targetTexture);
         // Release the Depth texture for the SourceDepth camera
         RenderTexture.ReleaseTemporary(sourceDepth.targetTexture);
-
-       /* if (lastStylizedFrame != null)
+        // Libera el buffer del frame previo
+        if (previousStylizedFrame != null)
         {
-            lastStylizedFrame.Release();
-            lastStylizedFrame = null;
-        }*/
+            previousStylizedFrame.Release();
+            previousStylizedFrame = null;
+        }
     }
 
     void Update()
     {
 
-        if (styleDepth.targetTexture.width != Screen.width ||styleDepth.targetTexture.height != Screen.height)
+        if (styleDepth.targetTexture.width != Screen.width || styleDepth.targetTexture.height != Screen.height)
         {
             // Get the screen dimensions
             int width = Screen.width;
@@ -93,13 +88,10 @@ public class StyleTransfer : MonoBehaviour
             sourceDepth.targetTexture = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.Depth);
         }
 
-        if (Input.GetKeyDown(KeyCode.Q)){
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
             stylizeImage = !stylizeImage;
 
-        }
-            
-        if (Input.GetKeyDown(KeyCode.Z)){
-            SceneManager.LoadScene("Scene");
         }
     }
 
@@ -120,41 +112,41 @@ public class StyleTransfer : MonoBehaviour
     }
 
 
-   private void Merge(RenderTexture styleImage, RenderTexture sourceImage)
-{
-    // Specify the number of threads on the GPU
-    int numthreads = 8;
-    // Get the index for the specified function in the ComputeShader
-    int kernelHandle = styleTransferShader.FindKernel("Merge");
-    // Define a temporary HDR RenderTexture
-    int width = styleImage.width;
-    int height = styleImage.height;
-    RenderTexture result = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.ARGBHalf);
-    // Enable random write access
-    result.enableRandomWrite = true;
-    // Create the HDR RenderTexture
-    result.Create();
+    private void Merge(RenderTexture styleImage, RenderTexture sourceImage)
+    {
+        // Specify the number of threads on the GPU
+        int numthreads = 8;
+        // Get the index for the specified function in the ComputeShader
+        int kernelHandle = styleTransferShader.FindKernel("Merge");
+        // Define a temporary HDR RenderTexture
+        int width = styleImage.width;
+        int height = styleImage.height;
+        RenderTexture result = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.ARGBHalf);
+        // Enable random write access
+        result.enableRandomWrite = true;
+        // Create the HDR RenderTexture
+        result.Create();
 
-    // Set the value for the Result variable in the ComputeShader
-    styleTransferShader.SetTexture(kernelHandle, "Result", result);
-    // Set the value for the InputImage variable in the ComputeShader
-    styleTransferShader.SetTexture(kernelHandle, "InputImage", styleImage);
-    // Set the value for the StyleDepth variable in the ComputeShader
-    styleTransferShader.SetTexture(kernelHandle, "StyleDepth", styleDepth.activeTexture);
-    // Set the value for the SrcDepth variable in the ComputeShader
-    styleTransferShader.SetTexture(kernelHandle, "SrcDepth", sourceDepth.activeTexture);
-    // Set the value for the SrcImage variable in the ComputeShader
-    styleTransferShader.SetTexture(kernelHandle, "SrcImage", sourceImage);
+        // Set the value for the Result variable in the ComputeShader
+        styleTransferShader.SetTexture(kernelHandle, "Result", result);
+        // Set the value for the InputImage variable in the ComputeShader
+        styleTransferShader.SetTexture(kernelHandle, "InputImage", styleImage);
+        // Set the value for the StyleDepth variable in the ComputeShader
+        styleTransferShader.SetTexture(kernelHandle, "StyleDepth", styleDepth.activeTexture);
+        // Set the value for the SrcDepth variable in the ComputeShader
+        styleTransferShader.SetTexture(kernelHandle, "SrcDepth", sourceDepth.activeTexture);
+        // Set the value for the SrcImage variable in the ComputeShader
+        styleTransferShader.SetTexture(kernelHandle, "SrcImage", sourceImage);
 
-    // Execute the ComputeShader
-    styleTransferShader.Dispatch(kernelHandle, result.width / numthreads, result.height / numthreads, 1);
+        // Execute the ComputeShader
+        styleTransferShader.Dispatch(kernelHandle, result.width / numthreads, result.height / numthreads, 1);
 
-    // Copy the result into the source RenderTexture
-    Graphics.Blit(result, styleImage);
+        // Copy the result into the source RenderTexture
+        Graphics.Blit(result, styleImage);
 
-    // Release the temporary RenderTexture
-    RenderTexture.ReleaseTemporary(result);
-}   
+        // Release the temporary RenderTexture
+        RenderTexture.ReleaseTemporary(result);
+    }
 
     private void StylizeImage(RenderTexture src)
     {
@@ -172,6 +164,9 @@ public class StyleTransfer : MonoBehaviour
             rTex = RenderTexture.GetTemporary(src.width, src.height, 24, src.format);
         }
 
+        RenderTexture originalNoStyle = RenderTexture.GetTemporary(rTex.width, rTex.height, 0, src.format);
+        Graphics.Blit(src, originalNoStyle);
+
         Graphics.Blit(src, rTex);
         ProcessImage(rTex, "ProcessInput");
         Tensor input = new Tensor(rTex, channels: 3);
@@ -182,59 +177,84 @@ public class StyleTransfer : MonoBehaviour
         prediction.ToRenderTexture(rTex);
         prediction.Dispose();
         ProcessImage(rTex, "ProcessOutput");
+
+        // Blend suavizado
+        // Graphics.Blit(Texture2D.blackTexture, previousStylizedFrame); // reinicia blending al negro
+
+        if (previousStylizedFrame == null || previousStylizedFrame.width != rTex.width || previousStylizedFrame.height != rTex.height)
+        {
+            if (previousStylizedFrame != null) previousStylizedFrame.Release();
+
+            previousStylizedFrame = new RenderTexture(rTex.width, rTex.height, 0, RenderTextureFormat.ARGBHalf);
+            previousStylizedFrame.enableRandomWrite = true;
+            previousStylizedFrame.Create();
+            ClearPreviousStylizedFrame(); 
+        }
+
+        if (enableTemporalBlending)
+        {
+            BlendWithPrevious(rTex, originalNoStyle);
+        }
+
+        BlendWithPrevious(rTex, originalNoStyle);
+
         Graphics.Blit(rTex, src);
         RenderTexture.ReleaseTemporary(rTex);
+        RenderTexture.ReleaseTemporary(originalNoStyle);
     }
 
     void OnRenderImage(RenderTexture src, RenderTexture dest)
     {
-       // Create a temporary RenderTexture to store copy of the current frame
+        // Create a temporary RenderTexture to store copy of the current frame
         RenderTexture sourceImage = RenderTexture.GetTemporary(src.width, src.height, 24, src.format);
         // Copy the current frame
         Graphics.Blit(src, sourceImage);
 
-        if (stylizeImage){ 
+        if (stylizeImage)
+        {
             StylizeImage(src);
-            if (targetedStylization){
+            if (targetedStylization)
+            {
                 // Merge the stylized frame and original frame
                 Merge(src, sourceImage);
-            }    
-        } 
+            }
+        }
 
         Graphics.Blit(src, dest);
 
         // Release the temporary RenderTexture
-        RenderTexture.ReleaseTemporary(sourceImage);   
-    
-        /* if (stylizeImage){
-            if (lastStylizedFrame == null || lastStylizedFrame.width != src.width || lastStylizedFrame.height != src.height)
-            {
-                if (lastStylizedFrame != null) lastStylizedFrame.Release();
-                lastStylizedFrame = new RenderTexture(src.width, src.height, 24, src.format);
-            }
+        RenderTexture.ReleaseTemporary(sourceImage);
+    }
 
-            if (blendTarget == null || blendTarget.width != src.width || blendTarget.height != src.height)
-            {
-                if (blendTarget != null) blendTarget.Release();
-                blendTarget = new RenderTexture(src.width, src.height, 24, src.format);
-            }
+    private void BlendWithPrevious(RenderTexture current, RenderTexture originalNoStyle)
+    {
+        int kernel = styleTransferShader.FindKernel("TemporalBlendWithSobel");
+        styleTransferShader.SetBool("ShowEdges", showEdges); // showEdges es tu variable pública
 
-            // Procesamos el frame actual
-            StylizeImage(src);
+        RenderTexture blended = RenderTexture.GetTemporary(current.width, current.height, 0, RenderTextureFormat.ARGBHalf);
+        blended.enableRandomWrite = true;
+        blended.Create();
 
-            // Hacemos blending entre el anterior y el actual
-            blendMaterial.SetTexture("_BlendTex", lastStylizedFrame);
-            blendMaterial.SetFloat("_Alpha", blendAlpha);
-            Graphics.Blit(src, blendTarget, blendMaterial);
+        // Setear texturas
+        styleTransferShader.SetTexture(kernel, "Result", blended);
+        styleTransferShader.SetTexture(kernel, "InputImage", current);               // imagen ya estilizada
+        styleTransferShader.SetTexture(kernel, "PreviousImage", previousStylizedFrame); // último frame con estilo
+        styleTransferShader.SetTexture(kernel, "EdgeSourceImage", originalNoStyle);  // imagen sin estilo
+        styleTransferShader.SetFloat("BlendFactor", blendFactor);
 
-            // Actualizamos el último frame
-            Graphics.Blit(blendTarget, lastStylizedFrame);
+        styleTransferShader.Dispatch(kernel, current.width / 8, current.height / 8, 1);
 
-            // Mostramos el resultado suavizado
-            Graphics.Blit(lastStylizedFrame, dest);
-        }else{
-            Graphics.Blit(src, dest);
-        }*/
+        Graphics.Blit(blended, current);
+        Graphics.Blit(current, previousStylizedFrame); //current o blended??
+
+        RenderTexture.ReleaseTemporary(blended);
+    }
+    private void ClearPreviousStylizedFrame()
+    {
+        var activeRT = RenderTexture.active;
+        RenderTexture.active = previousStylizedFrame;
+        GL.Clear(true, true, Color.black); // o usa Color.clear si prefieres transparente
+        RenderTexture.active = activeRT;
     }
 
 }

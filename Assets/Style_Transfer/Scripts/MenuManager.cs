@@ -39,7 +39,6 @@ public class MenuManager : MonoBehaviour
     private Animator animatorLado1;
     private Animator animatorLado2;
 
-    public GameObject imgDesactivada;
     private PlayerInput playerInput;
 
     void Start()//OPCION ARCAICA
@@ -72,10 +71,11 @@ public class MenuManager : MonoBehaviour
         //}
 
         if (!puedeMoverse) return; // Bloquea el input mientras la animación está activa
+
         
-        if (Input.GetKeyDown(KeyCode.P))
+        if (Input.GetKeyDown(KeyCode.M))
         {
-            menuactive=!menuactive;
+            menuactive = !menuactive;
 
             if (menuactive)
             {
@@ -104,7 +104,7 @@ public class MenuManager : MonoBehaviour
         {
             puedeMoverse = false; // Bloquea las teclas
             menu.SetActive(false);
-            imgDesactivada.SetActive(true);
+            //imgDesactivada.SetActive(true);
             
 
             animator.SetInteger("Direccion", -1);  
@@ -137,7 +137,7 @@ public class MenuManager : MonoBehaviour
         {
             puedeMoverse = false; // Bloquea las teclas
             menu.SetActive(false);
-            imgDesactivada.SetActive(true);
+            //imgDesactivada.SetActive(true);
 
             animator.SetInteger("Direccion", 1); 
             animatorLado1.SetInteger("Direccion", 1);  
@@ -169,7 +169,7 @@ public class MenuManager : MonoBehaviour
     void Reset(){
 
         menu.SetActive(true); 
-        imgDesactivada.SetActive(false);
+        //imgDesactivada.SetActive(false);
         animator.SetInteger("Direccion", 0);  
         animatorBordes.SetInteger("Direccion", 0);  
         animatorBordes2.SetInteger("Direccion", 0);  
@@ -228,7 +228,7 @@ public class MenuManager : MonoBehaviour
 
     public void OnImageClicked()
     {
-        styleSelected=-1;
+        styleSelected = -1;
     }
 
     public void closeMenu(){

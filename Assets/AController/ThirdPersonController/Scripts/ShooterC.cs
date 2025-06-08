@@ -28,9 +28,9 @@ public class ShooterC : MonoBehaviour
 
     public TextMeshProUGUI info;
     private int municion=0;
-    [SerializeField] private float tiempoMaximo; 
+    [SerializeField] private float cargaMaxima; 
     [SerializeField] private Slider slider; 
-    public float tiempoActual; 
+    public float cargaActual; 
     
     private Animator animator;
     private float aimWeight;
@@ -61,10 +61,8 @@ public class ShooterC : MonoBehaviour
         {
             SceneManager.LoadScene("Example_01");
         }
-        //tiempoActual-=Time.deltaTime;
-        //if(tiempoActual>=0){
-        slider.value=tiempoActual;
-        //}
+        
+        slider.value=cargaActual;
 
         Vector3 mousePosition=Vector3.zero;
         Vector2 screenPoint=new Vector2(Screen.width/2f,Screen.height/2f);
@@ -90,20 +88,20 @@ public class ShooterC : MonoBehaviour
             if(starterAssetsInputs.shoot){
                 
                 if(municion>0){
-                    tiempoActual+=2.5f; //cuanto sumo para el super disparo
+                    cargaActual+=2.5f; //cuanto sumo para el super disparo
                     municion-=1;
                     SetInfoText(municion+"/10");
                     
                     Vector3 aimDir=(mousePosition-spawnbulletp.position).normalized;
-                    if(tiempoActual==20f){//siguiente es super
+                    if(cargaActual==20f){//siguiente es super
                         objetActivable1.SetActive(true);
 
                     }
-                    if(tiempoActual==22.5f){//lo actual mas uno mas lo que sumo es que ese disparo es super 
+                    if(cargaActual==22.5f){//lo actual mas uno mas lo que sumo es que ese disparo es super 
                         sound2.Play();
                         objetActivable1.SetActive(false);
                         Instantiate(pfBullet, spawnbulletp.position,Quaternion.LookRotation(aimDir,Vector3.up));
-                        tiempoActual=0f;
+                        cargaActual=0f;
                     }else{
                         sound.Play();
                         Instantiate(pfBullet2, spawnbulletp.position,Quaternion.LookRotation(aimDir,Vector3.up));
@@ -137,7 +135,7 @@ public class ShooterC : MonoBehaviour
 	}
 
     public void ActivarTemporizador(){
-        tiempoActual=tiempoMaximo;
+        cargaActual=cargaMaxima;
         slider.maxValue=20f;
     }
     public void addBalas(){

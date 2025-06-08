@@ -2,12 +2,20 @@
 #pragma kernel ProcessInput
 #pragma kernel ProcessOutput
 #pragma kernel Merge
+#pragma kernel TemporalBlendWithSobel
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 RWTexture2D<half4> Result;
 // Stores the input image and is set with cs.SetTexture
 Texture2D<half4> InputImage;
+Texture2D<half4> PreviousImage;
+Texture2D<half4> EdgeSourceImage;   // Imagen original sin estilo (para Sobel)
+
+float BlendFactor; // Alfa
+
+SamplerState samplerState;
+bool ShowEdges;
 
 // Stores the depth data from the StyleDepth camera
 Texture2D<half4> StyleDepth;
@@ -44,3 +52,80 @@ void Merge(uint3 id : SV_DispatchThreadID)
         Result[id.xy] = half4(SrcImage[id.xy].r, SrcImage[id.xy].g, SrcImage[id.xy].b, SrcImage[id.xy].a);
     }
 }
+
+[numthreads(8, 8, 1)]
+void TemporalBlendWithSobel(uint3 id : SV_DispatchThreadID)
+{
+    int2 uv = id.xy;
+
+    float2 texSize;
+    EdgeSourceImage.GetDimensions(texSize.x, texSize.y);
+    float2 texelSize = 1.0 / texSize;
+
+    // Sobel sobre EdgeSourceImage (imagen sin estilo)
+    float sobelX = 0.0;
+    float sobelY = 0.0;
+    float3 kernelX[3] = {
+        float3(-1, 0, 1),
+        float3(-2, 0, 2),
+        float3(-1, 0, 1)
+    };
+    float3 kernelY[3] = {
+        float3(-1, -2, -1),
+        float3( 0,  0,  0),
+        float3( 1,  2,  1)
+    };
+
+    for (int i = -1; i <= 1; i++)
+    {
+        for (int j = -1; j <= 1; j++)
+        {
+            float2 offset = float2(i, j) * texelSize;
+            float luminance = dot(EdgeSourceImage[uv + int2(i, j)].rgb, float3(0.299, 0.587, 0.114));
+            sobelX += luminance * kernelX[i + 1][j + 1];
+            sobelY += luminance * kernelY[i + 1][j + 1];
+        }
+    }
+
+    float edgeStrength = sqrt(sobelX * sobelX + sobelY * sobelY);
+    edgeStrength = saturate(edgeStrength * 1.0); // intensidad de los bordes
+
+    float adaptiveAlpha = lerp(BlendFactor, 1.0, edgeStrength); // Menos mezcla en bordes
+
+    float4 current = InputImage[uv];
+    float4 previous = PreviousImage[uv];
+
+    if (ShowEdges)
+    {
+        float edgeVis = edgeStrength;
+        Result[uv] = float4(edgeVis, edgeVis, edgeVis, 1.0);
+    }
+    else
+    {
+        float4 blended = lerp(previous, current, adaptiveAlpha);
+        Result[uv] = blended;
+    }
+}
+//Otra opción borrando de linea 95 float4 current = InputImage[uv];   para abajo
+/*float4 current = InputImage[uv];
+    float4 previous = PreviousImage[uv];
+
+    // --- Comparación de color actual vs anterior ---
+    float colorDiff = distance(current.rgb, previous.rgb);
+    float motionWeight = saturate(1.0 - colorDiff * 1.0); // Ajusta el 5.0 para sensibilidad
+
+    // --- Mezcla adaptativa usando bordes y cambio de color ---
+    adaptiveAlpha = lerp(BlendFactor, 1.0, edgeStrength);
+    adaptiveAlpha *= motionWeight;
+
+    if (ShowEdges)
+    {
+        float edgeVis = edgeStrength;
+        Result[uv] = float4(edgeVis, edgeVis, edgeVis, 1.0);
+    }
+    else
+    {
+    float4 delta = current - previous;
+    float4 blended = previous + delta * adaptiveAlpha;
+        Result[uv] = blended;
+    }*/

@@ -115,10 +115,6 @@ public class LayerStyleTransfer : MonoBehaviour
             stylizeImage = !stylizeImage;
 
         }
-            
-        if (Input.GetKeyDown(KeyCode.Z)){
-            SceneManager.LoadScene("Scene");
-        }
     }
 
     private void ProcessImage(RenderTexture image, string functionName)
@@ -179,6 +175,7 @@ public class LayerStyleTransfer : MonoBehaviour
         RenderTexture.active = null;
         prediction.ToRenderTexture(rTex);
         prediction.Dispose();
+        
         ProcessImage(rTex, "ProcessOutput");
         Graphics.Blit(rTex, src);
         RenderTexture.ReleaseTemporary(rTex);
