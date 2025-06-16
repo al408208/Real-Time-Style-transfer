@@ -23,33 +23,38 @@ public class Bullet : MonoBehaviour
         bulletRigid.velocity=transform.forward*speed;
     }
 
-    private void OnTriggerEnter(Collider other){
-        if(other.GetComponent<TargetScript>()!=null){//hit
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.GetComponent<TargetScript>() != null)
+        {//hit
 
-            Instantiate(vfxHitgreen, transform.position,Quaternion.identity);
+            Instantiate(vfxHitgreen, transform.position, Quaternion.identity);
+            other.GetComponent<TargetScript>().slowed();
             other.GetComponent<TargetScript>().dañado(damage);
-        }else{
-            Instantiate(vfxHitred, transform.position,Quaternion.identity);
-            
         }
-        if((other.gameObject.layer == 0||other.gameObject.layer == 7||other.gameObject.layer == 8) &&
-                                GameManager.Instance.modalidadSeleccionada==GameManager.ModoJuego.C) {
+        else
+        {
+            Instantiate(vfxHitred, transform.position, Quaternion.identity);
+
+        }
+        if ((other.gameObject.layer == 0 || other.gameObject.layer == 7 || other.gameObject.layer == 8) &&
+                                GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.C)
+        {
             other.gameObject.layer = 6;
             // Get a list of the child objects for the selected GameObject
             Transform[] allChildren = other.transform.gameObject.GetComponentsInChildren<Transform>();
-            
+
             for (int i = 0; i < allChildren.Length; i++)
             {
                 // MeshRenderer meshRenderer = allChildren[i].GetComponent<MeshRenderer>();
-                    allChildren[i].gameObject.layer = 6;
+                allChildren[i].gameObject.layer = 6;
                 // if (meshRenderer != null && meshRenderer.enabled)
                 //  {
                 //      allChildren[i].gameObject.layer = 6;
                 // }
-                }
-                
-                Destroy(gameObject);
+            }
         }
+        Destroy(gameObject);
         
     }
 }

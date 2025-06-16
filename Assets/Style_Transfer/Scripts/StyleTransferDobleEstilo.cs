@@ -27,10 +27,10 @@ public class StyleTransferDobleEstilo : MonoBehaviour
     private bool imgclick = false;
 
     [Header("Temporal Blending")]
-    public bool showEdges = false;
     private RenderTexture previousStylizedFrame;
-    public bool enableTemporalBlending = true;  
-    [Range(0f, 1f)] public float blendFactor = 0.2f; // α
+    bool showEdges = false;
+    bool enableTemporalBlending = false;
+    public float blendFactor = 0.2f; // α
 
     void Start()
     {
@@ -41,7 +41,7 @@ public class StyleTransferDobleEstilo : MonoBehaviour
             Model runtimeModel = ModelLoader.Load(modelAssets[i]);
             engines[i] = WorkerFactory.CreateWorker(workerType, runtimeModel);
         }
-    
+
     }
 
     private void OnDisable()
@@ -54,7 +54,7 @@ public class StyleTransferDobleEstilo : MonoBehaviour
                 if (engine != null) engine.Dispose();
             }
         }
-        
+
         if (previousStylizedFrame != null)
         {
             previousStylizedFrame.Release();
@@ -95,19 +95,21 @@ public class StyleTransferDobleEstilo : MonoBehaviour
         //IWorker currentEngine = engines[currentModelIndex - 1]; // Ajustar índice ya que 0 es "sin modelo"
 
         RenderTexture rTex;
+        int finalTargetHeight = targetHeight;
+        int finalTargetWidth = src.width;
+
         if (src.height > targetHeight && targetHeight >= 8)
         {
-            float scale = src.height / targetHeight;
-            int targetWidth = (int)(src.width / scale);
-            targetHeight -= (targetHeight % 8);
-            targetWidth -= (targetWidth % 8);
-            rTex = RenderTexture.GetTemporary(targetWidth, targetHeight, 24, src.format);
-            
+            float scale = (float)src.height / (float)targetHeight;
+            finalTargetWidth = Mathf.FloorToInt(src.width / scale);
+            finalTargetHeight = Mathf.FloorToInt(src.height / scale);
+
+            // Alineamos a múltiplos de 8 sin modificar el campo original
+            finalTargetHeight = finalTargetHeight - (finalTargetHeight % 8);
+            finalTargetWidth = finalTargetWidth - (finalTargetWidth % 8);
         }
-        else
-        {
-            rTex = RenderTexture.GetTemporary(src.width, src.height, 24, src.format);
-        }
+
+        rTex = RenderTexture.GetTemporary(finalTargetWidth, finalTargetHeight, 24, src.format);
 
         RenderTexture originalNoStyle = RenderTexture.GetTemporary(rTex.width, rTex.height, 0, src.format);
         Graphics.Blit(src, originalNoStyle);
@@ -117,7 +119,7 @@ public class StyleTransferDobleEstilo : MonoBehaviour
 
         Tensor input = new Tensor(rTex, channels: 3);
         currentEngine.Execute(input);
-        
+
         Tensor prediction = currentEngine.PeekOutput();
         input.Dispose();
 
@@ -136,7 +138,7 @@ public class StyleTransferDobleEstilo : MonoBehaviour
             previousStylizedFrame = new RenderTexture(rTex.width, rTex.height, 0, RenderTextureFormat.ARGBHalf);
             previousStylizedFrame.enableRandomWrite = true;
             previousStylizedFrame.Create();
-            ClearPreviousStylizedFrame(); 
+            ClearPreviousStylizedFrame();
         }
 
         if (enableTemporalBlending)
@@ -205,7 +207,7 @@ public class StyleTransferDobleEstilo : MonoBehaviour
 
         RenderTexture.ReleaseTemporary(blended);
     }
-    
+
 
     private void ClearPreviousStylizedFrame()
     {
@@ -213,5 +215,17 @@ public class StyleTransferDobleEstilo : MonoBehaviour
         RenderTexture.active = previousStylizedFrame;
         GL.Clear(true, true, Color.black); // o usa Color.clear si prefieres transparente
         RenderTexture.active = activeRT;
+    }
+
+    public void SetTargetHeight(int newHeight)
+    {
+        targetHeight = newHeight;
+        ClearPreviousStylizedFrame(); // Esto fuerza el recálculo en el próximo frame
+    }
+    public void SetBlended(bool blend,bool edges)
+    {
+        enableTemporalBlending = blend;
+        showEdges = edges;
+        ClearPreviousStylizedFrame(); // Esto fuerza el recálculo en el próximo frame
     }
 }

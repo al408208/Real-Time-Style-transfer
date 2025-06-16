@@ -4,14 +4,11 @@ using UnityEngine;
 
 public class TargetScript : MonoBehaviour
 {
-
-    public GameObject player;
-    private int vida=100;
+    public Transform target; // Asigna aquí tu personaje en el inspector
+    public float speed = 2f;
+    private int vida=40;
     private Animator animator;
-    public GameEnding gameEnding;
-    public bool seguirPersonaje=false;
     public bool muerte=false;
-    public int velocidadp;
 
 
     // Start is called before the first frame update
@@ -25,42 +22,52 @@ public class TargetScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(this.gameObject.name!="zombi_cueva"){
-            if(Vector3.Distance(transform.position,player.transform.position)<7 && muerte==false){
-                seguirPersonaje=true;
-                var lookpos=player.transform.position-transform.position;//rotar en y hacia el personaje
-                lookpos.y=0;
-                var rotation=Quaternion.LookRotation(lookpos);
-                transform.rotation=Quaternion.RotateTowards(transform.rotation,rotation,2);
-                
-                transform.Translate(Vector3.forward*velocidadp*Time.deltaTime);//movimiento
-            }else{
-                seguirPersonaje=false;
-            }
+        if (target == null || vida<=0) return;
+
+        // Mira hacia el jugador (ignorando la altura para evitar que mire hacia arriba o abajo)
+        Vector3 direction = target.position - transform.position;
+        direction.y = 0f;
+        if (direction != Vector3.zero)
+        {
+            Quaternion toRotation = Quaternion.LookRotation(direction);
+            transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, Time.deltaTime * 5f);
         }
-        
-        
+
+        // Avanza hacia adelante
+        transform.position += transform.forward * speed * Time.deltaTime;
     }
 
-    void OnTriggerEnter (Collider other)
+    void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject == player)
+        if (other.CompareTag("Player"))
         {
-           gameEnding.CaughtPlayer ();
+            destroyer();
         }
     }
 
     public void dañado(int damage){
         vida-=damage;
         if(vida<=0){
+            if (animator != null)
+            {
+                animator.speed = 1f; 
+            }
             animator.SetBool("IsDead",true);
             Invoke("destroyer", 4f);
-            
         }
-
     }
 
-    private void destroyer(){
+    public void slowed()
+    {
+        speed /= 2f;
+        if (animator != null)
+        {
+            animator.speed = 0.5f; 
+        }
+    }
+
+    private void destroyer()
+    {
         Destroy(gameObject);
     }
 }

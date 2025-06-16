@@ -213,6 +213,31 @@ namespace StarterAssets
             CinemachineCameraTarget.transform.rotation = Quaternion.Euler(_cinemachineTargetPitch + CameraAngleOverride,
                 _cinemachineTargetYaw, 0.0f);
         }
+        
+        public void SetCameraRotation(Quaternion rotation)
+        {
+            // Extraemos los ángulos
+            Vector3 euler = rotation.eulerAngles;
+            euler.x = NormalizeAngle(euler.x);
+            euler.y = NormalizeAngle(euler.y);
+
+            _cinemachineTargetYaw = euler.y;
+            _cinemachineTargetPitch = euler.x;
+
+            // Aplicamos la rotación directamente por seguridad
+            CinemachineCameraTarget.transform.rotation = Quaternion.Euler(
+                _cinemachineTargetPitch + CameraAngleOverride,
+                _cinemachineTargetYaw,
+                0.0f
+            );
+        }
+        private float NormalizeAngle(float angle)
+        {
+            angle = angle % 360;
+            if (angle > 180)
+                angle -= 360;
+            return angle;
+        }
 
         private void Move()
         {
@@ -264,10 +289,11 @@ namespace StarterAssets
                     RotationSmoothTime);
 
                 // rotate to face input direction relative to camera position
-                if(_rotateOnMove){
+                if (_rotateOnMove)
+                {
                     transform.rotation = Quaternion.Euler(0.0f, rotation, 0.0f);
                 }
-                
+
             }
 
 

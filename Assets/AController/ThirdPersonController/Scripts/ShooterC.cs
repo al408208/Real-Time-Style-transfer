@@ -7,7 +7,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.Animations.Rigging;
 using UnityEngine.UI;
 using TMPro;
-using UnityEngine.SceneManagement;
 
 public class ShooterC : MonoBehaviour
 {
@@ -27,7 +26,7 @@ public class ShooterC : MonoBehaviour
     public AudioSource noAmmo;
 
     public TextMeshProUGUI info;
-    private int municion=0;
+    private int municion=1;
     [SerializeField] private float cargaMaxima; 
     [SerializeField] private Slider slider; 
     public float cargaActual; 
@@ -51,15 +50,6 @@ public class ShooterC : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.K))
         {
             ScreenCapture.CaptureScreenshot("012.png");
-        }
-
-        if (Input.GetKeyDown(KeyCode.Z))
-        {
-            SceneManager.LoadScene("Realistic Demo");
-        }
-        if (Input.GetKeyDown(KeyCode.X))
-        {
-            SceneManager.LoadScene("Example_01");
         }
         
         slider.value=cargaActual;
@@ -95,9 +85,8 @@ public class ShooterC : MonoBehaviour
                     Vector3 aimDir=(mousePosition-spawnbulletp.position).normalized;
                     if(cargaActual==20f){//siguiente es super
                         objetActivable1.SetActive(true);
-
                     }
-                    if(cargaActual==22.5f){//lo actual mas uno mas lo que sumo es que ese disparo es super 
+                    if(cargaActual==22.5f){//lo actual mas uno que sumo es que ese disparo es super 
                         sound2.Play();
                         objetActivable1.SetActive(false);
                         Instantiate(pfBullet, spawnbulletp.position,Quaternion.LookRotation(aimDir,Vector3.up));

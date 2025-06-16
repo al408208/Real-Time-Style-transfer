@@ -18,7 +18,7 @@ public class SpawnEffect : MonoBehaviour
     public GameObject player;
 
     [Header("Nombre de la escena a precargar")]
-    private string sceneToPreload = "Realistic Demo";
+    private string sceneToPreload = "RealisticDemo";
     AsyncOperation preloadOperation;
     [Header("Delay para evitar cargar durante picos de uso al principio")]
     public float delayBeforePreload = 3f;
@@ -34,6 +34,20 @@ public class SpawnEffect : MonoBehaviour
         var main = ps.main;
 
         main.duration = spawnEffectTime;
+        if (SceneManager.GetActiveScene().name == "SandBox")
+        {
+            sceneToPreload = "RealisticDemo";
+        }
+        else if (SceneManager.GetActiveScene().name == "RealisticDemo")
+        {
+            sceneToPreload = "Example_01";
+        }else{
+            sceneToPreload = "Sandbox";
+        }
+        if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.C)
+        {
+            sceneToPreload = "Sandbox";
+        }
 
         StartCoroutine(DelayedPreload());
     }

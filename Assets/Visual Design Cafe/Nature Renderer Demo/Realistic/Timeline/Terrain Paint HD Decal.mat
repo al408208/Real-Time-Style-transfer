@@ -21,22 +21,18 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Terrain Paint HD Decal
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
+  m_Shader: {fileID: 4800000, guid: 1d64af84bdc970c4fae0c1e06dd95b73, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
-  - _ALPHAPREMULTIPLY_ON
-  - _EMISSION
-  - _GLOSSYREFLECTIONS_OFF
-  m_InvalidKeywords:
   - _COLORMAP
   - _MATERIAL_AFFECTS_ALBEDO
+  m_InvalidKeywords: []
   m_LightmapFlags: 0
   m_EnableInstancingVariants: 1
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
-  stringTagMap:
-    RenderType: Transparent
+  m_CustomRenderQueue: 2000
+  stringTagMap: {}
   disabledShaderPasses:
   - DepthOnly
   - SHADOWCASTER
@@ -169,7 +165,7 @@ Material:
     - _DistortionStrength: 1
     - _DistortionStrengthScaled: 0.1
     - _DrawOrder: 0
-    - _DstBlend: 10
+    - _DstBlend: 1
     - _DstBlendAlpha: 1
     - _EmissionEnabled: 0
     - _EmissiveExposureWeight: 1
@@ -200,10 +196,9 @@ Material:
     - _SoftParticlesFarFadeDistance: 1
     - _SoftParticlesNearFadeDistance: 0
     - _SpecularHighlights: 1
-    - _SrcBlend: 1
+    - _SrcBlend: 5
     - _SrcBlendAlpha: 1
     - _Surface: 1
-    - _UVSec: 0
     - _Unity_Identify_HDRP_Decal: 1
     - _UseEmissiveIntensity: 0
     - _WorkflowMode: 1
