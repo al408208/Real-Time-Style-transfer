@@ -26,7 +26,7 @@ public class ShooterC : MonoBehaviour
     public AudioSource noAmmo;
 
     public TextMeshProUGUI info;
-    private int municion=1;
+    private int municion=0;
     [SerializeField] private float cargaMaxima; 
     [SerializeField] private Slider slider; 
     public float cargaActual; 
@@ -127,8 +127,8 @@ public class ShooterC : MonoBehaviour
         cargaActual=cargaMaxima;
         slider.maxValue=20f;
     }
-    public void addBalas(){
-        municion+=5;
+    public void addBalas(int cant){
+        municion+=cant;
         if(municion>10){
             municion=10;
         }

@@ -23,6 +23,10 @@ public class MainMenu : MonoBehaviour
     }
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            ScreenCapture.CaptureScreenshot("012.png");
+        }
         PointerEventData pointerData = new PointerEventData(eventSystem)
         {
             position = Input.mousePosition

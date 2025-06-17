@@ -13,30 +13,8 @@ public class PlayerInteraction : MonoBehaviour
     public float interactionDistance = 2f;
 
     public GameObject interactionUI;
-    public TextMeshProUGUI infoText; // Asigna el Text dentro de "Content"
     public GameObject aim;
 
-
-    void Start()
-    {
-
-        if (SceneManager.GetActiveScene().name == "SandBox")
-        {
-            infoText.text = "To Scene 2";
-        }
-        else if (SceneManager.GetActiveScene().name == "RealisticDemo")
-        {
-            infoText.text = "To Scene 3";
-        }else{
-            infoText.text = "Restart";
-        }
-        
-
-        if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.C)
-        {
-            infoText.text = "Restart";
-        }
-    }
     private void Update()
     {
         InteractionRay();

@@ -17,7 +17,7 @@ public class Rotation : MonoBehaviour
     {
         if (other.gameObject == player)
         {
-            shooterC.addBalas();
+            shooterC.addBalas(10);
             sound.Play();
             Destroy(gameObject);
         }
