@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cinemachine;
 using StarterAssets;
+using Unity.Barracuda;
 
 public class CamaraPortal : MonoBehaviour
 {
@@ -14,6 +15,12 @@ public class CamaraPortal : MonoBehaviour
     List<Collider> portalColliders = new List<Collider>();
     List<Collider> paredColliders = new List<Collider>();
     public CinemachineVirtualCamera playerFollowCamera;//damping..
+    public GameObject paredInvisible;
+    public StyleTransfer styleTransfer;
+    public int id = 0;
+    public List<GameObject> objetosACambiar;
+    public List<GameObject> objetosACambiar2;
+
 
     void Start()
     {
@@ -31,17 +38,20 @@ public class CamaraPortal : MonoBehaviour
     }
     void Update()
     {
-
+        if (Vector3.Distance(player.transform.position, portalSalida.position) > 2.3f)
+        {
+            paredInvisible.SetActive(true);
+        }
         if (collidersDisabled && Vector3.Distance(player.transform.position, portalSalida.position) > 1.6f)
         {
 
             EnableCollisionsPortal();
+            collidersDisabled = false;
         }
         if (collidersDisabled && Vector3.Distance(player.transform.position, portalSalida.position) > 4.8f)
         {
 
             EnableCollisionsPared();
-            collidersDisabled = false; // Resetear el estado
         }
 
         if (!collidersDisabled && Vector3.Distance(player.transform.position, portalSalida.position) < 1.6f)
@@ -106,9 +116,11 @@ public class CamaraPortal : MonoBehaviour
                 if (cc != null) cc.enabled = true;
 
                 StartCoroutine(RestoreDampingNextFrame(playerFollowCamera, originalDamping));
-                Debug.Log("Teletransportado a " + other.transform.position);
                 DisableCollisions("pared");
                 DisableCollisions("portal");
+                paredInvisible.SetActive(false);
+                estilizado();
+                
             }
         }
     }
@@ -143,12 +155,64 @@ public class CamaraPortal : MonoBehaviour
         foreach (Collider col in portalColliders)
             col.enabled = true;
     }
-    
+
     IEnumerator RestoreDampingNextFrame(CinemachineVirtualCamera vcam, Vector3 originalDamping)
     {
         yield return null; // Espera un frame
         vcam.GetCinemachineComponent<Cinemachine3rdPersonFollow>().Damping = originalDamping;
     }
+
+    void CambiarLayerRecursivo(GameObject obj, int nuevoLayer)
+    {
+        obj.layer = nuevoLayer;
+        foreach (Transform hijo in obj.transform)
+        {
+            CambiarLayerRecursivo(hijo.gameObject, nuevoLayer);
+        }
+    }
+    void estilizado()
+    {
+        if (id == 1)
+        {
+            int layer = LayerMask.NameToLayer("Style2");
+            foreach (GameObject obj in objetosACambiar)
+            {
+                if (obj != null)
+                {
+                    CambiarLayerRecursivo(obj, layer);
+                }
+            }
+            layer = LayerMask.NameToLayer("Style3");//para las paredes de detras
+            foreach (GameObject obj in objetosACambiar2)
+            {
+                if (obj != null)
+                {
+                    CambiarLayerRecursivo(obj, layer);
+                }
+            }
+            CambiarLayerRecursivo(player, LayerMask.NameToLayer("Style"));
+
+        }else{
+            int layer = LayerMask.NameToLayer("Default");
+            CambiarLayerRecursivo(player, layer);
+            foreach (GameObject obj in objetosACambiar)
+            {
+                if (obj != null)
+                {
+                    CambiarLayerRecursivo(obj, layer);
+                }
+            }
+            layer = LayerMask.NameToLayer("Transparente");
+            foreach (GameObject obj in objetosACambiar2)
+            {
+                if (obj != null)
+                {
+                    CambiarLayerRecursivo(obj, layer);
+                }
+            }
+        }
+    }
+
 }
 
 

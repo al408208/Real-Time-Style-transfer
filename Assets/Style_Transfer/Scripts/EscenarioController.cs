@@ -6,7 +6,6 @@ public class EscenarioController : MonoBehaviour
 {
     public StyleTransferDobleEstilo scriptModoA;
     public LayerStyleTransfer scriptModoB;
-    public StyleTransfer scriptModoC;
     public MenuManager menuManager;
 
     public GameObject camExtra1;
@@ -32,11 +31,6 @@ public class EscenarioController : MonoBehaviour
                 camExtra3.SetActive(true);
                 sourceCam.SetActive(true);
                 scriptModoB.enabled = true;
-                break;
-            case GameManager.ModoJuego.C:
-                camExtra1.SetActive(true);
-                sourceCam.SetActive(true);
-                scriptModoC.enabled = true;
                 break;
         }
 

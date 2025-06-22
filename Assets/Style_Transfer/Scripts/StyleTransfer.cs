@@ -34,15 +34,18 @@ public class StyleTransfer : MonoBehaviour
     private IWorker engine;
 
     [Header("Temporal Blending")]
-    public bool showEdges = false;
+    bool showEdges = false;
     private RenderTexture previousStylizedFrame;
     [Range(0f, 1f)] public float blendFactor = 0.2f; // α
-    public bool enableTemporalBlending = true;    // <— controla el blending
+    bool enableTemporalBlending = false;    // <— controla el blending
+    public int stylizeEveryNFrames = 2;
+    private int currentFrame = 0;
+    private RenderTexture cachedStylizedFrame;
 
 
     void Start()
     {
-
+        
         // Get the screen dimensions
         int width = Screen.width;
         int height = Screen.height;
@@ -55,7 +58,8 @@ public class StyleTransfer : MonoBehaviour
         sourceDepth.targetTexture = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.Depth);
         sourceDepth.forceIntoRenderTexture = true;
 
-
+        cachedStylizedFrame = new RenderTexture(Screen.width, Screen.height, 0, RenderTextureFormat.ARGBHalf);
+        cachedStylizedFrame.Create();
         m_RuntimeModel = ModelLoader.Load(modelAsset);
         engine = WorkerFactory.CreateWorker(workerType, m_RuntimeModel);
     }
@@ -170,9 +174,22 @@ public class StyleTransfer : MonoBehaviour
         Graphics.Blit(src, rTex);
         ProcessImage(rTex, "ProcessInput");
         Tensor input = new Tensor(rTex, channels: 3);
-        engine.Execute(input);
-        Tensor prediction = engine.PeekOutput();
+        IEnumerator schedule = engine.StartManualSchedule(input);
+
+        
+        // 4.2. Iteramos TODO el grafo para que Barracuda prepare cada capa
+        //      (sin esta iteración, nunca se encola nada internamente).
+        while (schedule.MoveNext())
+        {
+            // Aquí 'MoveNext' encola capa tras capa; no hay que hacer nada dentro.
+        }
+
+        // 4.3. Una vez terminado el recorrido, ya podemos liberar el Tensor de entrada
         input.Dispose();
+        // 4.4. Forzamos la ejecución de lo que haya encolado el schedule
+        engine.FlushSchedule();
+        Tensor prediction = engine.PeekOutput();
+
         RenderTexture.active = null;
         prediction.ToRenderTexture(rTex);
         prediction.Dispose();
@@ -196,8 +213,6 @@ public class StyleTransfer : MonoBehaviour
             BlendWithPrevious(rTex, originalNoStyle);
         }
 
-        BlendWithPrevious(rTex, originalNoStyle);
-
         Graphics.Blit(rTex, src);
         RenderTexture.ReleaseTemporary(rTex);
         RenderTexture.ReleaseTemporary(originalNoStyle);
@@ -212,15 +227,25 @@ public class StyleTransfer : MonoBehaviour
 
         if (stylizeImage)
         {
-            StylizeImage(src);
-            if (targetedStylization)
+            if (currentFrame % stylizeEveryNFrames == 0)
             {
-                // Merge the stylized frame and original frame
-                Merge(src, sourceImage);
+                Graphics.Blit(src, cachedStylizedFrame);  // copiar el frame original
+                StylizeImage(cachedStylizedFrame);
+                if (targetedStylization)
+                {
+                    // Merge the stylized frame and original frame
+                    Merge(cachedStylizedFrame, sourceImage);
+                }
             }
+            Graphics.Blit(cachedStylizedFrame, dest); // usar el resultado cacheado
+            currentFrame++;
+            
         }
+        else
+        {
 
-        Graphics.Blit(src, dest);
+            Graphics.Blit(src, dest);
+        }
 
         // Release the temporary RenderTexture
         RenderTexture.ReleaseTemporary(sourceImage);

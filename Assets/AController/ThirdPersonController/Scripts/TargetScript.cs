@@ -6,7 +6,7 @@ public class TargetScript : MonoBehaviour
 {
     public Transform target; // Asigna aquí tu personaje en el inspector
     public float speed = 2f;
-    private int vida=40;
+    private int vida=41;
     private Animator animator;
     public bool muerte=false;
 
@@ -68,6 +68,8 @@ public class TargetScript : MonoBehaviour
 
     private void destroyer()
     {
+        
+        muerte = true;
         Destroy(gameObject);
     }
 }

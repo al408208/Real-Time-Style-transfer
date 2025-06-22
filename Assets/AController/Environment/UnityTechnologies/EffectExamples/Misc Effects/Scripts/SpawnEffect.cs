@@ -42,11 +42,8 @@ public class SpawnEffect : MonoBehaviour
         {
             sceneToPreload = "Example_01";
         }else{
-            sceneToPreload = "Sandbox";
-        }
-        if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.C)
-        {
-            sceneToPreload = "Sandbox";
+            
+            sceneToPreload = "MainMenu";
         }
 
         StartCoroutine(DelayedPreload());
@@ -96,6 +93,21 @@ public class SpawnEffect : MonoBehaviour
     {
         if (sceneReady && preloadOperation != null)
         {
+            if (sceneToPreload == "Example_01")
+            {
+                GameObject graphy = GameObject.Find("[Graphy]");//destruyo persistencias
+                GameObject gm = GameObject.Find("GameManager");//destruyo persistencias
+                
+                if (graphy != null)
+                {
+                    Destroy(graphy);
+                }
+                if (gm != null)
+                {
+                    Destroy(gm);
+                }
+            }
+            
             preloadOperation.allowSceneActivation = true;
         }
         else

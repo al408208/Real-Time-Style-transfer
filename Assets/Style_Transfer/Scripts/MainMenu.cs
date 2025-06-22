@@ -11,16 +11,11 @@ public class MainMenu : MonoBehaviour
     public EventSystem eventSystem;      // Asigna el EventSystem de la escena
     public Image image1, image2, image3;       // Asigna aquí las 3 imágenes a controlar
     public RectTransform selector;
-    
-    private AsyncOperation preloadOperation;
-    private bool sceneReady = false;
+    public Slider barraCarga;  // Asigna desde el Inspector
+    public GameObject barra; 
+    public GameObject Menu; 
 
-    void Start()
-    {
-        preloadOperation = SceneManager.LoadSceneAsync("SandBox");
-        preloadOperation.allowSceneActivation = false;
-        StartCoroutine(EsperarCarga());
-    }
+
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.K))
@@ -80,35 +75,49 @@ public class MainMenu : MonoBehaviour
         SeleccionarModo(3);
     }
 
-    IEnumerator EsperarCarga()
-    {
-        while (preloadOperation.progress < 0.9f)
-            yield return null;
-
-        sceneReady = true;
-        Debug.Log("Escena precargada y lista para activar.");
-    }
     public void SeleccionarModo(int modo)
     {
+
         if (modo == 1)
         {
             GameManager.Instance.modalidadSeleccionada = GameManager.ModoJuego.A;
+            StartCoroutine(CargarEscena("SandBox"));
         }
         else if (modo == 2)
         {
             GameManager.Instance.modalidadSeleccionada = GameManager.ModoJuego.B;
+            StartCoroutine(CargarEscena("SandBox"));
         }
         else
         {
-            GameManager.Instance.modalidadSeleccionada = GameManager.ModoJuego.C;
+            StartCoroutine(CargarEscena("TestRoom"));
         }
-        if (sceneReady)
+        Menu.SetActive(false);
+    }
+
+    IEnumerator CargarEscena(string nombre)
+    {
+        barra.SetActive(true);
+        AsyncOperation carga = SceneManager.LoadSceneAsync(nombre);
+        carga.allowSceneActivation = false;
+
+        float timer = 0f;
+
+        while (carga.progress < 0.9f || timer < 2f)
         {
-            preloadOperation.allowSceneActivation = true;
+            timer += Time.deltaTime;
+            float progresoReal = Mathf.Clamp01(carga.progress / 0.9f);
+            barraCarga.value = Mathf.Clamp01(timer / 2f * progresoReal);  // sube en 2s como mínimo
+            yield return null;
         }
-        else
-        {
-            Debug.LogWarning("La escena aún no está lista. Esperá un momento.");
-        }
+
+        // Llenar barra al 100%
+        barraCarga.value = 1f;
+
+        // Esperar un momento o mostrar mensaje "Presiona para continuar"
+        yield return new WaitForSeconds(0.3f);
+
+        carga.allowSceneActivation = true;
+        
     }
 }

@@ -32,6 +32,11 @@ public class StyleTransferDobleEstilo : MonoBehaviour
     bool enableTemporalBlending = false;
     public float blendFactor = 0.2f; // α
 
+    public int stylizeEveryNFrames = 2;
+    private int currentFrame = 0;
+    private RenderTexture cachedStylizedFrame;
+
+
     void Start()
     {
         // Inicializar los workers para todos los modelos
@@ -41,7 +46,9 @@ public class StyleTransferDobleEstilo : MonoBehaviour
             Model runtimeModel = ModelLoader.Load(modelAssets[i]);
             engines[i] = WorkerFactory.CreateWorker(workerType, runtimeModel);
         }
-
+        
+        cachedStylizedFrame = new RenderTexture(Screen.width, Screen.height, 0, RenderTextureFormat.ARGBHalf);
+        cachedStylizedFrame.Create();
     }
 
     private void OnDisable()
@@ -118,10 +125,22 @@ public class StyleTransferDobleEstilo : MonoBehaviour
         ProcessImage(rTex, "ProcessInput");
 
         Tensor input = new Tensor(rTex, channels: 3);
-        currentEngine.Execute(input);
 
-        Tensor prediction = currentEngine.PeekOutput();
+        IEnumerator schedule = currentEngine.StartManualSchedule(input);
+
+        
+        // 4.2. Iteramos TODO el grafo para que Barracuda prepare cada capa
+        //      (sin esta iteración, nunca se encola nada internamente).
+        while (schedule.MoveNext())
+        {
+            // Aquí 'MoveNext' encola capa tras capa; no hay que hacer nada dentro.
+        }
+
+        // 4.3. Una vez terminado el recorrido, ya podemos liberar el Tensor de entrada
         input.Dispose();
+        // 4.4. Forzamos la ejecución de lo que haya encolado el schedule
+        currentEngine.FlushSchedule();
+        Tensor prediction = currentEngine.PeekOutput();
 
         RenderTexture.active = null;
         prediction.ToRenderTexture(rTex);
@@ -157,10 +176,20 @@ public class StyleTransferDobleEstilo : MonoBehaviour
     {
         if (currentEngine != null)
         {
-            StylizeImage(src);
+            if (currentFrame % stylizeEveryNFrames == 0)
+            {
+                Graphics.Blit(src, cachedStylizedFrame);  // copiar el frame original
+                StylizeImage(cachedStylizedFrame);
+            }
+            Graphics.Blit(cachedStylizedFrame, dest); // usar el resultado cacheado
+            currentFrame++;
+            
         }
+        else
+        {
 
-        Graphics.Blit(src, dest);
+            Graphics.Blit(src, dest);
+        }
     }
 
     private void ProcessImage(RenderTexture image, string functionName)
@@ -182,6 +211,7 @@ public class StyleTransferDobleEstilo : MonoBehaviour
     public void OnImageClicked()
     {
         imgclick = true;
+        Debug.Log(imgclick);
     }
 
     private void BlendWithPrevious(RenderTexture current, RenderTexture originalNoStyle)

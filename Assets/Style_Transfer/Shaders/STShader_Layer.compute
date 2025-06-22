@@ -17,8 +17,8 @@ Texture2D<half4> StyleDepth;
 
 // Stores the depth data from the SourceDepth camera
 Texture2D<half4> SrcDepth;
-Texture2D<half4> StyleDepth2;       // profundidad estilo 2
-Texture2D<float>  StyleDepth3;    // profundidad de estilo 3
+Texture2D<half4> StyleDepth2;       // style 2
+Texture2D<float>  StyleDepth3;    // style 3
 
 // Store the original image from the current frame
 Texture2D<half4> SrcImage;

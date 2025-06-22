@@ -33,6 +33,7 @@ public class ShooterC : MonoBehaviour
     
     private Animator animator;
     private float aimWeight;
+    private int i = 0;
 
     private StarterAssetsInputs starterAssetsInputs;
     private ThirdPersonController thirdPersonController;
@@ -45,11 +46,12 @@ public class ShooterC : MonoBehaviour
         ActivarTemporizador();
     }
     private void Update(){
-        
+
 
         if (Input.GetKeyDown(KeyCode.K))
         {
-            ScreenCapture.CaptureScreenshot("012.png");
+            ScreenCapture.CaptureScreenshot(i + ".png");
+            i++;
         }
         
         slider.value=cargaActual;
@@ -78,7 +80,7 @@ public class ShooterC : MonoBehaviour
             if(starterAssetsInputs.shoot){
                 
                 if(municion>0){
-                    cargaActual+=2.5f; //cuanto sumo para el super disparo
+                    cargaActual+=2f; //cuanto sumo para el super disparo
                     municion-=1;
                     SetInfoText(municion+"/10");
                     
@@ -131,6 +133,9 @@ public class ShooterC : MonoBehaviour
         municion+=cant;
         if(municion>10){
             municion=10;
+        }
+        if(municion<0){
+            municion=0;
         }
         SetInfoText(municion+"/10");
     }

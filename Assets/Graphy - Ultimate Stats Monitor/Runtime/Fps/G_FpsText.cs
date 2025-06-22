@@ -65,30 +65,30 @@ namespace Tayx.Graphy.Fps
 
             // Only update texts 'm_updateRate' times per second
 
-            if( m_deltaTime > 1f / m_updateRate )
+            if (m_deltaTime > 1f / m_updateRate)
             {
                 m_fps = m_frameCount / m_deltaTime;
                 m_ms = m_deltaTime / m_frameCount * 1000f;
 
                 // Update fps
-                m_fpsText.text = Mathf.RoundToInt( m_fps ).ToStringNonAlloc();
-                SetFpsRelatedTextColor( m_fpsText, m_fps );
+                m_fpsText.text = Mathf.RoundToInt(m_fps).ToStringNonAlloc();
+                SetFpsRelatedTextColor(m_fpsText, m_fps);
 
                 // Update ms
-                m_msText.text = m_ms.ToStringNonAlloc( m_msStringFormat );
-                SetFpsRelatedTextColor( m_msText, m_fps );
+                m_msText.text = m_ms.ToStringNonAlloc(m_msStringFormat);
+                SetFpsRelatedTextColor(m_msText, m_fps);
 
                 // Update 1% fps
-                m_onePercentFpsText.text = ((int) (m_fpsMonitor.OnePercentFPS)).ToStringNonAlloc();
-                SetFpsRelatedTextColor( m_onePercentFpsText, m_fpsMonitor.OnePercentFPS );
+                m_onePercentFpsText.text = ((int)(m_fpsMonitor.OnePercentFPS)).ToStringNonAlloc();
+                SetFpsRelatedTextColor(m_onePercentFpsText, m_fpsMonitor.OnePercentFPS);
 
                 // Update 0.1% fps
-                m_zero1PercentFpsText.text = ((int) (m_fpsMonitor.Zero1PercentFps)).ToStringNonAlloc();
-                SetFpsRelatedTextColor( m_zero1PercentFpsText, m_fpsMonitor.Zero1PercentFps );
+                m_zero1PercentFpsText.text = ((int)(m_fpsMonitor.Zero1PercentFps)).ToStringNonAlloc();
+                SetFpsRelatedTextColor(m_zero1PercentFpsText, m_fpsMonitor.Zero1PercentFps);
 
                 // Update avg fps
-                m_avgFpsText.text = ((int) (m_fpsMonitor.AverageFPS)).ToStringNonAlloc();
-                SetFpsRelatedTextColor( m_avgFpsText, m_fpsMonitor.AverageFPS );
+                m_avgFpsText.text = ((int)(m_fpsMonitor.AverageFPS)).ToStringNonAlloc();
+                SetFpsRelatedTextColor(m_avgFpsText, m_fpsMonitor.AverageFPS);
 
                 // Reset variables
                 m_deltaTime = 0f;
@@ -121,15 +121,15 @@ namespace Tayx.Graphy.Fps
         /// <param name="fps">
         /// Numeric fps value
         /// </param>
-        private void SetFpsRelatedTextColor( Text text, float fps )
+        private void SetFpsRelatedTextColor(Text text, float fps)
         {
-            int roundedFps = Mathf.RoundToInt( fps );
+            int roundedFps = Mathf.RoundToInt(fps);
 
-            if( roundedFps >= m_graphyManager.GoodFPSThreshold )
+            if (roundedFps >= m_graphyManager.GoodFPSThreshold)
             {
                 text.color = m_graphyManager.GoodFPSColor;
             }
-            else if( roundedFps >= m_graphyManager.CautionFPSThreshold )
+            else if (roundedFps >= m_graphyManager.CautionFPSThreshold)
             {
                 text.color = m_graphyManager.CautionFPSColor;
             }
@@ -141,8 +141,8 @@ namespace Tayx.Graphy.Fps
 
         private void Init()
         {
-            G_IntString.Init( 0, 2000 ); // Max fps expected
-            G_FloatString.Init( 0, 100 ); // Max ms expected per frame
+            G_IntString.Init(0, 2000); // Max fps expected
+            G_FloatString.Init(0, 100); // Max ms expected per frame
 
             m_graphyManager = transform.root.GetComponentInChildren<GraphyManager>();
 
@@ -151,6 +151,19 @@ namespace Tayx.Graphy.Fps
             UpdateParameters();
         }
 
+        public float getMS()
+        {
+            return m_ms;
+        }
+        public float getfps()
+        {
+            return m_fps;
+        }
+        public float getavg()
+        {
+            return m_fpsMonitor.AverageFPS;
+        }
+        
         #endregion
     }
 }
