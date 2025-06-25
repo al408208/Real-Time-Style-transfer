@@ -211,7 +211,6 @@ public class StyleTransferDobleEstilo : MonoBehaviour
     public void OnImageClicked()
     {
         imgclick = true;
-        Debug.Log(imgclick);
     }
 
     private void BlendWithPrevious(RenderTexture current, RenderTexture originalNoStyle)
@@ -252,7 +251,11 @@ public class StyleTransferDobleEstilo : MonoBehaviour
         targetHeight = newHeight;
         ClearPreviousStylizedFrame(); // Esto fuerza el recálculo en el próximo frame
     }
-    public void SetBlended(bool blend,bool edges)
+    public int GetTargetHeight()
+    {
+        return targetHeight;
+    }
+    public void SetBlended(bool blend, bool edges)
     {
         enableTemporalBlending = blend;
         showEdges = edges;

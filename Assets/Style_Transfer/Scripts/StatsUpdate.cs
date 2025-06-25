@@ -13,6 +13,7 @@ public class StatsUpdate : MonoBehaviour
     private Vector2 lastResolution;
     public int menuTargetHeight = 540;
     public StyleTransferDobleEstilo styleTransfer;
+    public LayerStyleTransfer styleTransferLayer;
     public Toggle blendingToggle; // Asigna en el Inspector
     public Toggle edgesToggle; // Asigna en el Inspector
     public Slider blendSlider;
@@ -31,6 +32,15 @@ public class StatsUpdate : MonoBehaviour
 
         blendSlider.onValueChanged.AddListener(OnBlendValueChanged);
         blendSlider.value = styleTransfer.blendFactor;
+        if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.A)
+        {
+            menuTargetHeight = styleTransfer.GetTargetHeight();
+        }else if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.B)
+        {
+            menuTargetHeight = styleTransferLayer.GetTargetHeight();
+            
+        }
+        inputField.text = menuTargetHeight.ToString();
     }
 
     // Update is called once per frame
@@ -49,11 +59,11 @@ public class StatsUpdate : MonoBehaviour
         Wunit.text = Screen.width.ToString();
     }
 
-    public void UpdateClicked()
+    public void UpdateClicked()//cambiar targuet height
     {
         if (int.TryParse(inputField.text, out int menuTargetHeight))
         {
-            if (styleTransfer.targetHeight != menuTargetHeight)
+            if (styleTransfer.targetHeight != menuTargetHeight && GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.A)
             {
                 if (menuTargetHeight > 540)
                 {
@@ -67,6 +77,20 @@ public class StatsUpdate : MonoBehaviour
                 {
                     styleTransfer.SetTargetHeight(menuTargetHeight);
                 }
+            }else if (styleTransferLayer.targetHeight != menuTargetHeight && GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.B)
+            {
+                if (menuTargetHeight > 540)
+                {
+                    styleTransferLayer.SetTargetHeight(540);
+                }
+                else if (menuTargetHeight < 0)
+                {
+                    styleTransferLayer.SetTargetHeight(0);
+                }
+                else
+                {
+                    styleTransferLayer.SetTargetHeight(menuTargetHeight);
+                }
             }
         }
         else
@@ -79,13 +103,26 @@ public class StatsUpdate : MonoBehaviour
     {
         bool enableBlending = blendingToggle.isOn;
         bool showEdges = edgesToggle.isOn;
-
-        styleTransfer.SetBlended(enableBlending, showEdges);
+        if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.A)
+        {
+            styleTransfer.SetBlended(enableBlending, showEdges);
+        }else if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.B)
+        {
+            styleTransferLayer.SetBlended(enableBlending, showEdges);
+        }
+        
     }
 
     void OnBlendValueChanged(float value)
     {
-        styleTransfer.blendFactor = value;
+        if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.A)
+        {
+            styleTransfer.blendFactor = value;
+        }else if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.B)
+        {
+            styleTransferLayer.blendFactor = value;
+        }
+       
     }
 
 

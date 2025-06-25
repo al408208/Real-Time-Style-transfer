@@ -115,7 +115,7 @@ public class MainMenu : MonoBehaviour
         barraCarga.value = 1f;
 
         // Esperar un momento o mostrar mensaje "Presiona para continuar"
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.1f);
 
         carga.allowSceneActivation = true;
         

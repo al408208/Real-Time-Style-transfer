@@ -40,7 +40,14 @@ public class LayerStyleTransfer : MonoBehaviour
     public Camera sourceDepth;
 
     private Model m_RuntimeModel;
-    public int stylizeEveryNFrames = 3;
+
+    [Header("Temporal Blending")]
+    private RenderTexture previousStylizedFrame;
+    bool showEdges = false;
+    bool enableTemporalBlending = false;
+    public float blendFactor = 0.2f; // α
+
+    public int stylizeEveryNFrames = 2;
     private int currentFrame = 0;
     private RenderTexture cachedStylizedFrame;
     void Start()
@@ -87,6 +94,11 @@ public class LayerStyleTransfer : MonoBehaviour
         RenderTexture.ReleaseTemporary(styleDepth3.targetTexture);
         // Release the Depth texture for the SourceDepth camera
         RenderTexture.ReleaseTemporary(sourceDepth.targetTexture);
+        if (previousStylizedFrame != null)
+        {
+            previousStylizedFrame.Release();
+            previousStylizedFrame = null;
+        }
 
     }
 
@@ -108,13 +120,16 @@ public class LayerStyleTransfer : MonoBehaviour
             styleDepth3.targetTexture = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.Depth);
             styleDepth3.forceIntoRenderTexture = true;
             sourceDepth.targetTexture = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.Depth);
+
+            if (cachedStylizedFrame != null)//para poder redimensionar
+            {
+                cachedStylizedFrame.Release();
+            }
+            cachedStylizedFrame = new RenderTexture(width, height, 0, RenderTextureFormat.ARGBHalf);
+            cachedStylizedFrame.enableRandomWrite = true;
+            cachedStylizedFrame.Create();
         }
 
-
-        if (Input.GetKeyDown(KeyCode.Q)){
-            stylizeImage = !stylizeImage;
-
-        }
     }
 
     private void ProcessImage(RenderTexture image, string functionName)
@@ -142,15 +157,19 @@ public class LayerStyleTransfer : MonoBehaviour
         if (src.height > targetHeight && targetHeight >= 8)
         {
             float scale = (float)src.height / (float)targetHeight;
-            finalTargetWidth  = Mathf.FloorToInt(src.width  / scale);
+            finalTargetWidth = Mathf.FloorToInt(src.width / scale);
             finalTargetHeight = Mathf.FloorToInt(src.height / scale);
 
             // Alineamos a múltiplos de 8 sin modificar el campo original
             finalTargetHeight = finalTargetHeight - (finalTargetHeight % 8);
-            finalTargetWidth  = finalTargetWidth  - (finalTargetWidth  % 8);
+            finalTargetWidth = finalTargetWidth - (finalTargetWidth % 8);
         }
 
         rTex = RenderTexture.GetTemporary(finalTargetWidth, finalTargetHeight, 24, src.format);
+
+        RenderTexture originalNoStyle = RenderTexture.GetTemporary(rTex.width, rTex.height, 0, src.format);
+        Graphics.Blit(src, originalNoStyle);
+
         Graphics.Blit(src, rTex);
         ProcessImage(rTex, "ProcessInput");
 
@@ -175,13 +194,32 @@ public class LayerStyleTransfer : MonoBehaviour
         RenderTexture.active = null;
         prediction.ToRenderTexture(rTex);
         prediction.Dispose();
-        
+
         ProcessImage(rTex, "ProcessOutput");
+
+        // Blend suavizado
+        // Graphics.Blit(Texture2D.blackTexture, previousStylizedFrame); // reinicia blending al negro
+
+        if (previousStylizedFrame == null || previousStylizedFrame.width != rTex.width || previousStylizedFrame.height != rTex.height)
+        {
+            if (previousStylizedFrame != null) previousStylizedFrame.Release();
+
+            previousStylizedFrame = new RenderTexture(rTex.width, rTex.height, 0, RenderTextureFormat.ARGBHalf);
+            previousStylizedFrame.enableRandomWrite = true;
+            previousStylizedFrame.Create();
+            ClearPreviousStylizedFrame();
+        }
+
+        if (enableTemporalBlending)
+        {
+            BlendWithPrevious(rTex, originalNoStyle);
+        }
         Graphics.Blit(rTex, src);
         RenderTexture.ReleaseTemporary(rTex);
+        RenderTexture.ReleaseTemporary(originalNoStyle);
     }
 
-   private void Merge(RenderTexture styleImage1, RenderTexture styleImage2, RenderTexture styleImage3, RenderTexture sourceImage)
+    private void Merge(RenderTexture styleImage1, RenderTexture styleImage2, RenderTexture styleImage3, RenderTexture sourceImage)
     {
         int numthreads = 8;
         int kernelHandle = styleTransferShader.FindKernel("Merge");
@@ -242,6 +280,56 @@ public class LayerStyleTransfer : MonoBehaviour
         RenderTexture.ReleaseTemporary(originalFrame);
         RenderTexture.ReleaseTemporary(styleFrame2);
         RenderTexture.ReleaseTemporary(styleFrame3);
+    }
+    private void BlendWithPrevious(RenderTexture current, RenderTexture originalNoStyle)
+    {
+        int kernel = styleTransferShader.FindKernel("TemporalBlendWithSobel");
+        styleTransferShader.SetBool("ShowEdges", showEdges); // showEdges es tu variable pública
+
+        RenderTexture blended = RenderTexture.GetTemporary(current.width, current.height, 0, RenderTextureFormat.ARGBHalf);
+        blended.enableRandomWrite = true;
+        blended.Create();
+
+        // Setear texturas
+        styleTransferShader.SetTexture(kernel, "Result", blended);
+        styleTransferShader.SetTexture(kernel, "InputImage", current);               // imagen ya estilizada
+        styleTransferShader.SetTexture(kernel, "PreviousImage", previousStylizedFrame); // último frame con estilo
+        styleTransferShader.SetTexture(kernel, "EdgeSourceImage", originalNoStyle);  // imagen sin estilo
+        styleTransferShader.SetFloat("BlendFactor", blendFactor);
+
+        styleTransferShader.Dispatch(kernel, current.width / 8, current.height / 8, 1);
+
+        Graphics.Blit(blended, current);
+        Graphics.Blit(current, previousStylizedFrame); //current o blended??
+
+        RenderTexture.ReleaseTemporary(blended);
+    }
+    private void ClearPreviousStylizedFrame()
+    {
+        var activeRT = RenderTexture.active;
+        RenderTexture.active = previousStylizedFrame;
+        GL.Clear(true, true, Color.black); // o usa Color.clear si prefieres transparente
+        RenderTexture.active = activeRT;
+    }
+    public void SetTargetHeight(int newHeight)
+    {
+        targetHeight = newHeight;
+        ClearPreviousStylizedFrame(); // Esto fuerza el recálculo en el próximo frame
+    }
+    public int GetTargetHeight()
+    {
+        return targetHeight;
+    }
+    public void SetBlended(bool blend, bool edges)
+    {
+        enableTemporalBlending = blend;
+        showEdges = edges;
+        ClearPreviousStylizedFrame(); // Esto fuerza el recálculo en el próximo frame
+    }
+    
+    public void OnImageClicked()
+    {
+        stylizeImage = !stylizeImage;
     }
 
 

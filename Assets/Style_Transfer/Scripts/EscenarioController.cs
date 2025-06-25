@@ -19,6 +19,7 @@ public class EscenarioController : MonoBehaviour
 
     void Start()
     {
+        Cursor.lockState = CursorLockMode.None;
         switch (GameManager.Instance.modalidadSeleccionada)
         {
             case GameManager.ModoJuego.A:
@@ -38,8 +39,17 @@ public class EscenarioController : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
-        {
+        {   
+           
             statsactivate = !statsactivate;
+            if (statsactivate)
+            {
+                Cursor.lockState = CursorLockMode.None;
+            }
+            else
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+            }
             Estadisticas1.SetActive(statsactivate);
             Estadisticas2.SetActive(statsactivate);
         }
