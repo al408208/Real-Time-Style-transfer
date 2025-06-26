@@ -45,7 +45,7 @@ public class StyleTransfer : MonoBehaviour
 
     void Start()
     {
-        
+
         // Get the screen dimensions
         int width = Screen.width;
         int height = Screen.height;
@@ -90,12 +90,6 @@ public class StyleTransfer : MonoBehaviour
             // Assign depth textures with the new dimensions
             styleDepth.targetTexture = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.Depth);
             sourceDepth.targetTexture = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.Depth);
-        }
-
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            stylizeImage = !stylizeImage;
-
         }
     }
 
@@ -176,7 +170,7 @@ public class StyleTransfer : MonoBehaviour
         Tensor input = new Tensor(rTex, channels: 3);
         IEnumerator schedule = engine.StartManualSchedule(input);
 
-        
+
         // 4.2. Iteramos TODO el grafo para que Barracuda prepare cada capa
         //      (sin esta iteración, nunca se encola nada internamente).
         while (schedule.MoveNext())
@@ -205,7 +199,7 @@ public class StyleTransfer : MonoBehaviour
             previousStylizedFrame = new RenderTexture(rTex.width, rTex.height, 0, RenderTextureFormat.ARGBHalf);
             previousStylizedFrame.enableRandomWrite = true;
             previousStylizedFrame.Create();
-            ClearPreviousStylizedFrame(); 
+            ClearPreviousStylizedFrame();
         }
 
         if (enableTemporalBlending)
@@ -239,7 +233,7 @@ public class StyleTransfer : MonoBehaviour
             }
             Graphics.Blit(cachedStylizedFrame, dest); // usar el resultado cacheado
             currentFrame++;
-            
+
         }
         else
         {
@@ -280,6 +274,25 @@ public class StyleTransfer : MonoBehaviour
         RenderTexture.active = previousStylizedFrame;
         GL.Clear(true, true, Color.black); // o usa Color.clear si prefieres transparente
         RenderTexture.active = activeRT;
+    }
+    public void SetTargetHeight(int newHeight)
+    {
+        targetHeight = newHeight;
+        ClearPreviousStylizedFrame(); // Esto fuerza el recálculo en el próximo frame
+    }
+    public int GetTargetHeight()
+    {
+        return targetHeight;
+    }
+    public void SetBlended(bool blend, bool edges)
+    {
+        enableTemporalBlending = blend;
+        showEdges = edges;
+        ClearPreviousStylizedFrame(); // Esto fuerza el recálculo en el próximo frame
+    }
+    public void OnImageClicked()
+    {
+        stylizeImage = !stylizeImage;
     }
 
 }

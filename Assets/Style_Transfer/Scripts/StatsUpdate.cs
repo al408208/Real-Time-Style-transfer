@@ -14,6 +14,7 @@ public class StatsUpdate : MonoBehaviour
     public int menuTargetHeight = 540;
     public StyleTransferDobleEstilo styleTransfer;
     public LayerStyleTransfer styleTransferLayer;
+    public StyleTransfer styleTransferMechanics;
     public Toggle blendingToggle; // Asigna en el Inspector
     public Toggle edgesToggle; // Asigna en el Inspector
     public Slider blendSlider;
@@ -31,14 +32,22 @@ public class StatsUpdate : MonoBehaviour
         edgesToggle.onValueChanged.AddListener(OnSettingsChanged);
 
         blendSlider.onValueChanged.AddListener(OnBlendValueChanged);
-        blendSlider.value = styleTransfer.blendFactor;
+
         if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.A)
         {
             menuTargetHeight = styleTransfer.GetTargetHeight();
-        }else if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.B)
+            blendSlider.value = styleTransfer.blendFactor;
+        }
+        else if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.B)
         {
             menuTargetHeight = styleTransferLayer.GetTargetHeight();
-            
+            blendSlider.value = styleTransferLayer.blendFactor;
+
+        }
+        else if (styleTransferMechanics != null && GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.C)
+        {
+            menuTargetHeight = styleTransferMechanics.GetTargetHeight();
+            blendSlider.value = styleTransferMechanics.blendFactor;
         }
         inputField.text = menuTargetHeight.ToString();
     }
@@ -63,7 +72,7 @@ public class StatsUpdate : MonoBehaviour
     {
         if (int.TryParse(inputField.text, out int menuTargetHeight))
         {
-            if (styleTransfer.targetHeight != menuTargetHeight && GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.A)
+            if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.A && styleTransfer.targetHeight != menuTargetHeight )
             {
                 if (menuTargetHeight > 540)
                 {
@@ -77,7 +86,7 @@ public class StatsUpdate : MonoBehaviour
                 {
                     styleTransfer.SetTargetHeight(menuTargetHeight);
                 }
-            }else if (styleTransferLayer.targetHeight != menuTargetHeight && GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.B)
+            }else if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.B && styleTransferLayer.targetHeight != menuTargetHeight )
             {
                 if (menuTargetHeight > 540)
                 {
@@ -90,6 +99,21 @@ public class StatsUpdate : MonoBehaviour
                 else
                 {
                     styleTransferLayer.SetTargetHeight(menuTargetHeight);
+                }
+            }else if (styleTransferMechanics != null && GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.C &&
+            styleTransferMechanics.targetHeight != menuTargetHeight )
+            {
+                if (menuTargetHeight > 540)
+                {
+                    styleTransferMechanics.SetTargetHeight(540);
+                }
+                else if (menuTargetHeight < 0)
+                {
+                    styleTransferMechanics.SetTargetHeight(0);
+                }
+                else
+                {
+                    styleTransferMechanics.SetTargetHeight(menuTargetHeight);
                 }
             }
         }
@@ -106,9 +130,13 @@ public class StatsUpdate : MonoBehaviour
         if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.A)
         {
             styleTransfer.SetBlended(enableBlending, showEdges);
-        }else if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.B)
+        }
+        else if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.B)
         {
             styleTransferLayer.SetBlended(enableBlending, showEdges);
+        }else if (styleTransferMechanics != null && GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.C)
+        {
+            styleTransferMechanics.SetBlended(enableBlending, showEdges);
         }
         
     }
@@ -121,11 +149,12 @@ public class StatsUpdate : MonoBehaviour
         }else if (GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.B)
         {
             styleTransferLayer.blendFactor = value;
+        }else if (styleTransferMechanics != null && GameManager.Instance.modalidadSeleccionada == GameManager.ModoJuego.C)
+        {
+            styleTransferMechanics.blendFactor = value;
         }
        
     }
-
-
 
     private void OnEnable()
     {

@@ -13,9 +13,12 @@ public class MainMenu : MonoBehaviour
     public RectTransform selector;
     public Slider barraCarga;  // Asigna desde el Inspector
     public GameObject barra; 
-    public GameObject Menu; 
+    public GameObject Menu;
 
-
+    void Start()
+    {
+        Cursor.lockState = CursorLockMode.None;
+    }
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.K))
@@ -26,7 +29,7 @@ public class MainMenu : MonoBehaviour
         {
             position = Input.mousePosition
         };
-
+        
         List<RaycastResult> results = new List<RaycastResult>();
         raycaster.Raycast(pointerData, results);
 
@@ -90,6 +93,7 @@ public class MainMenu : MonoBehaviour
         }
         else
         {
+            GameManager.Instance.modalidadSeleccionada = GameManager.ModoJuego.C;
             StartCoroutine(CargarEscena("TestRoom"));
         }
         Menu.SetActive(false);

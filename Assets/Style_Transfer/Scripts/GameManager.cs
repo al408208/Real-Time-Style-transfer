@@ -6,7 +6,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
-    public enum ModoJuego { A, B }
+    public enum ModoJuego { A, B, C }
     public ModoJuego modalidadSeleccionada;
 
     private void Awake()

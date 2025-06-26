@@ -15,11 +15,13 @@ public class EscenarioController : MonoBehaviour
     
     private bool statsactivate=true; 
     public GameObject Estadisticas1;
-    public GameObject Estadisticas2;
+    
+    public GameObject  graphy;
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.None;
+        graphy = GameObject.FindWithTag("Graphy");
         switch (GameManager.Instance.modalidadSeleccionada)
         {
             case GameManager.ModoJuego.A:
@@ -45,13 +47,11 @@ public class EscenarioController : MonoBehaviour
             if (statsactivate)
             {
                 Cursor.lockState = CursorLockMode.None;
-            }
-            else
-            {
+            }else{
                 Cursor.lockState = CursorLockMode.Locked;
             }
             Estadisticas1.SetActive(statsactivate);
-            Estadisticas2.SetActive(statsactivate);
+            graphy.SetActive(statsactivate);
         }
     }
 }

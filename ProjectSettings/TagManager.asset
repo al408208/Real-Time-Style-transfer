@@ -8,6 +8,7 @@ TagManager:
   - Interactuable
   - portal
   - pared
+  - Graphy
   layers:
   - Default
   - TransparentFX
