@@ -100,7 +100,6 @@ public class SpawnEffect : MonoBehaviour
                 
                 if (graphy != null)
                 {
-                    Debug.Log("ddd");
                     Destroy(graphy);
                 }
                 if (gm != null)

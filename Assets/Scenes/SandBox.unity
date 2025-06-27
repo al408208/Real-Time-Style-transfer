@@ -295,7 +295,7 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 0ae4780976f4ecc4f9f2825343d99847, type: 3}
   - {fileID: 2800000, guid: f4cf9703ce69c974083582a5d1d547bf, type: 3}
   - {fileID: 2800000, guid: e7d404e90f887ea4dbf3acb65bbe9199, type: 3}
-  - {fileID: 2800000, guid: 1f5bc33104854bd4dae7de78e5a4dea4, type: 3}
+  - {fileID: 2800000, guid: d82818fdc61781c4cbc4070356966f60, type: 3}
   - {fileID: 2800000, guid: ccc404458838c344a9dd7b6052cd2a26, type: 3}
 --- !u!4 &5532425
 Transform:
@@ -5281,7 +5281,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 1f5bc33104854bd4dae7de78e5a4dea4, type: 3}
+  m_Texture: {fileID: 2800000, guid: d82818fdc61781c4cbc4070356966f60, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -25836,12 +25836,12 @@ MonoBehaviour:
   styleTransferShader: {fileID: 7200000, guid: 4380f32f0ab7b2148b5714236626c3ec, type: 3}
   targetHeight: 540
   modelAssets:
-  - {fileID: 5022602860645237092, guid: ae883f0315ea4004f9d8ac6794499bc8, type: 3}
-  - {fileID: 5022602860645237092, guid: 95b4cd3c4011f9447aa9cfff158441d2, type: 3}
-  - {fileID: 5022602860645237092, guid: b6ebe4f7c7357c24682ff90334d2f769, type: 3}
-  - {fileID: 5022602860645237092, guid: 3fda253299d297e41a0c0187dcd062eb, type: 3}
+  - {fileID: 5022602860645237092, guid: e3ae541636a463c4d9467e85a915945e, type: 3}
+  - {fileID: 5022602860645237092, guid: fe4583e452de69c4ca736f57e8202a37, type: 3}
+  - {fileID: 5022602860645237092, guid: f270d49f01961114ab9c06b1e0fbb615, type: 3}
+  - {fileID: 5022602860645237092, guid: 133031ad9b4cee84e86e47257cbb8c00, type: 3}
+  - {fileID: 5022602860645237092, guid: ad6460baf64ec674e8c0685ea8c75a25, type: 3}
   - {fileID: 5022602860645237092, guid: f3e2d42a82d81354483e7f80df649c40, type: 3}
-  - {fileID: 5022602860645237092, guid: eb27f3701c885f042956557cdff51478, type: 3}
   workerType: 256
   menuManager: {fileID: 5532424}
   blendFactor: 0.6

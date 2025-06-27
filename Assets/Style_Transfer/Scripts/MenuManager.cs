@@ -134,7 +134,6 @@ public class MenuManager : MonoBehaviour
                 }
             }
             
-            Debug.Log(styleIn);
             Invoke("Reset", 0.8f);
         }
 

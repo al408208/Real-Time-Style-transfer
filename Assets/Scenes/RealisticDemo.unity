@@ -3923,7 +3923,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1669108186}
   m_Direction: 2
   m_Value: 1.0000004
-  m_Size: 0.11308411
+  m_Size: 0.1130841
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -5437,7 +5437,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Texture: {fileID: 2800000, guid: 1f5bc33104854bd4dae7de78e5a4dea4, type: 3}
+  m_Texture: {fileID: 2800000, guid: d82818fdc61781c4cbc4070356966f60, type: 3}
   m_UVRect:
     serializedVersion: 2
     x: 0
@@ -7067,7 +7067,7 @@ MonoBehaviour:
   - {fileID: 2800000, guid: 0ae4780976f4ecc4f9f2825343d99847, type: 3}
   - {fileID: 2800000, guid: f4cf9703ce69c974083582a5d1d547bf, type: 3}
   - {fileID: 2800000, guid: e7d404e90f887ea4dbf3acb65bbe9199, type: 3}
-  - {fileID: 2800000, guid: 1f5bc33104854bd4dae7de78e5a4dea4, type: 3}
+  - {fileID: 2800000, guid: d82818fdc61781c4cbc4070356966f60, type: 3}
   - {fileID: 2800000, guid: ccc404458838c344a9dd7b6052cd2a26, type: 3}
 --- !u!114 &803041502
 MonoBehaviour:
@@ -7328,8 +7328,8 @@ MonoBehaviour:
   stylizeImage: 1
   targetedStylization: 1
   targetHeight: 480
-  modelAsset: {fileID: 5022602860645237092, guid: 95b4cd3c4011f9447aa9cfff158441d2, type: 3}
-  modelAsset2: {fileID: 5022602860645237092, guid: cf02769a9dad68343940da034b88cb89, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: e1f122fac009b9e4e88ccdd1898a768f, type: 3}
+  modelAsset2: {fileID: 5022602860645237092, guid: ae883f0315ea4004f9d8ac6794499bc8, type: 3}
   modelAsset3: {fileID: 5022602860645237092, guid: cf02769a9dad68343940da034b88cb89, type: 3}
   workerType: 256
   styleDepth: {fileID: 1841985491}
@@ -7353,11 +7353,11 @@ MonoBehaviour:
   styleTransferShader: {fileID: 7200000, guid: 4380f32f0ab7b2148b5714236626c3ec, type: 3}
   targetHeight: 540
   modelAssets:
-  - {fileID: 5022602860645237092, guid: e55f29fb7935a01409ce6fb45884492f, type: 3}
+  - {fileID: 5022602860645237092, guid: e3ae541636a463c4d9467e85a915945e, type: 3}
   - {fileID: 5022602860645237092, guid: 936697d0861226a4686225282056e355, type: 3}
-  - {fileID: 5022602860645237092, guid: fe4583e452de69c4ca736f57e8202a37, type: 3}
   - {fileID: 5022602860645237092, guid: f270d49f01961114ab9c06b1e0fbb615, type: 3}
   - {fileID: 5022602860645237092, guid: 133031ad9b4cee84e86e47257cbb8c00, type: 3}
+  - {fileID: 5022602860645237092, guid: ad6460baf64ec674e8c0685ea8c75a25, type: 3}
   - {fileID: 5022602860645237092, guid: f3e2d42a82d81354483e7f80df649c40, type: 3}
   workerType: 256
   menuManager: {fileID: 803041501}

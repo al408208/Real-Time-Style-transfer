@@ -61,7 +61,7 @@ public class MainMenu : MonoBehaviour
 
         if (!hovered)
         {
-            selector.anchoredPosition = new Vector2(-1300, selector.anchoredPosition.y);
+            selector.anchoredPosition = new Vector2(-2000, selector.anchoredPosition.y);
             // selector.gameObject.SetActive(false);
         }
     }

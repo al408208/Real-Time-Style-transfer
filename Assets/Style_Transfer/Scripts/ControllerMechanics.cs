@@ -7,7 +7,7 @@ public class ControllerMechanics : MonoBehaviour
     public ShooterC shooterC;
     private bool statsactivate = true; 
     public GameObject Estadisticas1;
-    public GameObject Estadisticas2;
+    public GameObject graphy;
     public TargetScript Enemy1;
     public TargetScript Enemy2;
     public Alcanzado alc;
@@ -18,6 +18,8 @@ public class ControllerMechanics : MonoBehaviour
     void Start()
     {
         Cursor.lockState = CursorLockMode.None;
+        GameManager.Instance.RegistrarGraphy();
+        graphy = GameManager.Instance.graphy;
 
     }
 
@@ -34,7 +36,7 @@ public class ControllerMechanics : MonoBehaviour
                 Cursor.lockState = CursorLockMode.Locked;
             }
             Estadisticas1.SetActive(statsactivate);
-            Estadisticas2.SetActive(statsactivate);
+            graphy.SetActive(statsactivate);
         }
         if (alc.GetAlcanzado())
         {
