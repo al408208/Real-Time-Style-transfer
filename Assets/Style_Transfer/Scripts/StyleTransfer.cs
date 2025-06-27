@@ -90,6 +90,14 @@ public class StyleTransfer : MonoBehaviour
             // Assign depth textures with the new dimensions
             styleDepth.targetTexture = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.Depth);
             sourceDepth.targetTexture = RenderTexture.GetTemporary(width, height, 24, RenderTextureFormat.Depth);
+            
+            if (cachedStylizedFrame != null)//para poder redimensionar
+            {
+                cachedStylizedFrame.Release();
+            }
+            cachedStylizedFrame = new RenderTexture(width, height, 0, RenderTextureFormat.ARGBHalf);
+            cachedStylizedFrame.enableRandomWrite = true;
+            cachedStylizedFrame.Create();
         }
     }
 

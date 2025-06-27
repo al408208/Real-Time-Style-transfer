@@ -12,6 +12,7 @@ public class MenuManager : MonoBehaviour
     public GameObject menu;
     public GameObject hud;
     public GameObject carrousel;
+    public GameObject fondo;
     private bool puedeMoverse = true; // Variable para controlar el input
     private bool menuactive=false; 
 
@@ -82,6 +83,7 @@ public class MenuManager : MonoBehaviour
                 aux.anchoredPosition = new Vector2(aux.anchoredPosition.x, 0);
                 menu.SetActive(true);
                 carrousel.SetActive(true);
+                fondo.SetActive(true);
                 hud.SetActive(false);
                 playerInput.enabled = false; // Desactiva input del jugador
 
@@ -91,6 +93,7 @@ public class MenuManager : MonoBehaviour
                 hud.SetActive(true);
                 menu.SetActive(false);
                 carrousel.SetActive(false);
+                fondo.SetActive(false);
                 playerInput.enabled = true; // Desactiva input del jugador
             }
         }
@@ -130,6 +133,8 @@ public class MenuManager : MonoBehaviour
                     rawImage3.texture = imagenes[styleIn+1];
                 }
             }
+            
+            Debug.Log(styleIn);
             Invoke("Reset", 0.8f);
         }
 

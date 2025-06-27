@@ -95,11 +95,12 @@ public class SpawnEffect : MonoBehaviour
         {
             if (sceneToPreload == "MainMenu")
             {
-                GameObject graphy = GameObject.Find("[Graphy]");//destruyo persistencias
+                GameObject graphy = GameManager.Instance.graphy;//destruyo persistencias
                 GameObject gm = GameObject.Find("GameManager");//destruyo persistencias
                 
                 if (graphy != null)
                 {
+                    Debug.Log("ddd");
                     Destroy(graphy);
                 }
                 if (gm != null)

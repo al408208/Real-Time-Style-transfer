@@ -12,8 +12,10 @@ public class MainMenu : MonoBehaviour
     public Image image1, image2, image3;       // Asigna aquí las 3 imágenes a controlar
     public RectTransform selector;
     public Slider barraCarga;  // Asigna desde el Inspector
-    public GameObject barra; 
-    public GameObject Menu;
+    public GameObject barra;
+    public GameObject menu;
+    public GameObject controls;
+    bool cActive = false;
 
     void Start()
     {
@@ -29,7 +31,7 @@ public class MainMenu : MonoBehaviour
         {
             position = Input.mousePosition
         };
-        
+
         List<RaycastResult> results = new List<RaycastResult>();
         raycaster.Raycast(pointerData, results);
 
@@ -96,7 +98,7 @@ public class MainMenu : MonoBehaviour
             GameManager.Instance.modalidadSeleccionada = GameManager.ModoJuego.C;
             StartCoroutine(CargarEscena("TestRoom"));
         }
-        Menu.SetActive(false);
+        menu.SetActive(false);
     }
 
     IEnumerator CargarEscena(string nombre)
@@ -122,6 +124,11 @@ public class MainMenu : MonoBehaviour
         yield return new WaitForSeconds(0.1f);
 
         carga.allowSceneActivation = true;
-        
+
+    }
+    public void InfoClicked()
+    {
+        cActive = !cActive;
+        controls.SetActive(cActive);
     }
 }

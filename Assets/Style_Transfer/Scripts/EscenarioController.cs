@@ -21,12 +21,13 @@ public class EscenarioController : MonoBehaviour
     void Start()
     {
         Cursor.lockState = CursorLockMode.None;
-        graphy = GameObject.FindWithTag("Graphy");
+        GameManager.Instance.RegistrarGraphy();
+        graphy = GameManager.Instance.graphy;
         switch (GameManager.Instance.modalidadSeleccionada)
         {
             case GameManager.ModoJuego.A:
-                scriptModoA.enabled = true;
                 menuManager.enabled = true;
+                scriptModoA.enabled = true;
                 break;
             case GameManager.ModoJuego.B:
                 camExtra1.SetActive(true);

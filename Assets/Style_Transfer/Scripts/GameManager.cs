@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 
     public enum ModoJuego { A, B, C }
     public ModoJuego modalidadSeleccionada;
+    public GameObject graphy;
 
     private void Awake()
     {
@@ -19,6 +20,20 @@ public class GameManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    public void RegistrarGraphy()
+    {
+        //GameObject posibleGraphy = GameObject.FindWithTag("Graphy");
+        GameObject posibleGraphy = GameObject.Find("[Graphy]");
+        if (posibleGraphy != null)
+        {
+            graphy = posibleGraphy; // solo si lo encuentra
+        }
+        if (graphy != null)
+        {
+            graphy.SetActive(true);
         }
     }
 }

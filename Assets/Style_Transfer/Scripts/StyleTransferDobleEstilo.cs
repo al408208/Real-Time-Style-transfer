@@ -73,10 +73,11 @@ public class StyleTransferDobleEstilo : MonoBehaviour
     {
         if ((Input.GetKeyDown(KeyCode.Return) && menuManager.getMenuActive()) || imgclick)
         {
+            
             if (!menuManager.getPuedeMoverse()) return; // Bloquea el input mientras la animación está activa
 
             int selectedStyle = menuManager.getStyle(); // Obtener el estilo seleccionado desde MenuManager
-
+            
             if (selectedStyle >= 0 && selectedStyle < engines.Length)
             {
                 currentEngine = engines[selectedStyle]; // Activar el modelo seleccionado
