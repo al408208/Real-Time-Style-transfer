@@ -9,6 +9,7 @@ public class SpawnEffect : MonoBehaviour
     public float spawnEffectTime = 2;
     public float pause = 1;
     public AnimationCurve fadeIn;
+    public AudioSource sound;
 
     ParticleSystem ps;
     float timer = 0;
@@ -67,7 +68,7 @@ public class SpawnEffect : MonoBehaviour
         if (other.gameObject == player)
         {
             ps.Play();
-
+            sound.Play();
             Invoke("ActivarEscena", 1.5f);
         }
     }

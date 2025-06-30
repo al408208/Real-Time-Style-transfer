@@ -42,12 +42,8 @@ public class MenuManager : MonoBehaviour
 
     private PlayerInput playerInput;
 
-    void Start()//OPCION ARCAICA
+    void Start()
     {
-        //OPCION ARCAICA
-        //rawImage1.texture = CargarImagen("3");  // Busca "1.png" o "1.jpg" en Resources
-        //rawImage2.texture = CargarImagen("2");
-        //rawImage3.texture = CargarImagen("1");
 
         animator = AnimrawImage2.GetComponent<Animator>();
         animatorLado1 = AnimrawImage1.GetComponent<Animator>();
@@ -58,18 +54,9 @@ public class MenuManager : MonoBehaviour
        playerInput = FindObjectOfType<ThirdPersonController>().GetComponent<PlayerInput>();
     }
 
-    Texture2D CargarImagen(string nombreArchivo)
-    {
-        return Resources.Load<Texture2D>(nombreArchivo);
-    }
-
     // Update is called once per frame
     void Update()
     { 
-        
-        //if (Input.GetKeyDown(KeyCode.A)){
-            //ScreenCapture.CaptureScreenshot("SomeLevel1.png");
-        //}
 
         if (!puedeMoverse) return; // Bloquea el input mientras la animación está activa
 
@@ -94,7 +81,7 @@ public class MenuManager : MonoBehaviour
                 menu.SetActive(false);
                 carrousel.SetActive(false);
                 fondo.SetActive(false);
-                playerInput.enabled = true; // Desactiva input del jugador
+                playerInput.enabled = true; 
             }
         }
 
@@ -214,11 +201,14 @@ public class MenuManager : MonoBehaviour
             AnimrawImage3.texture = imagenes[styleIn+1];
             AnimrawImage4.texture= imagenes[styleIn+2];
         }
-       
-        puedeMoverse = true; // Bloquea las teclas
+        Invoke("Teclado", 0.2f);
+      
     }
-   
 
+    void Teclado()
+    {
+          puedeMoverse = true; // Bloquea las teclas
+    }
     public int getStyle(){
         return styleSelected;
     }
