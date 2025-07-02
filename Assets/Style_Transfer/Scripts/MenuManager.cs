@@ -231,7 +231,7 @@ public class MenuManager : MonoBehaviour
         menu.SetActive(false);
         hud.SetActive(true);
         //si yo desactivo el carrousel no da tiempo a reiniciar animaciones y se queda con mal diseño, necesito el carrousel siempre activo
-        aux.anchoredPosition = new Vector2(aux.anchoredPosition.x, 500);
+        aux.anchoredPosition = new Vector2(aux.anchoredPosition.x, 700);
         //carrousel.SetActive(false);
     }    
 
